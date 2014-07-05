@@ -5,7 +5,8 @@ function set_mail_by_innerHTML( node_name ) {
 	 var node = document.getElementById( node_name );
 	 if (node) {
 	 	 addr = ("g" + String.fromCharCode(64) + "gandrade" + String.fromCharCode(46) + "net");
-		 node.innerHTML = "<a href=mailto:" + addr + ">" + addr + "</a>";
+		 pgp_info = "PGP: 0x35CB8191";
+		 node.innerHTML = "<a href=mailto:" + addr + ">" + addr + "</a><br>" + pgp_info;
 	 }
 }
 
