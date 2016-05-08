@@ -1,0 +1,4 @@
+[submodule "coalescence"]
+	path = coalescence
+	url = https://github.com/g-andrade/coalescence-synth.git
+	branch = master
