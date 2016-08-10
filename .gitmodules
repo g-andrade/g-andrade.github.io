@@ -2,3 +2,6 @@
 	path = coalescence
 	url = https://github.com/g-andrade/coalescence-synth.git
 	branch = master
+[submodule "teardrop"]
+	path = teardrop
+	url = https://github.com/g-andrade/teardrop.git
