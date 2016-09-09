@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>erlchronos</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle
+
+# erlchronos #
+`erlchronos`: A gen_server wrapper with ticks
+
+<br><br>
+Guilherme Andrade
+
+---
+class: middle
+
+* *erlang:send_after/3* approach is very susceptible to jitter on processes that receive a lot of messages
+
+* We could pattern match directly over the process inbox, effectively turning into a priority queue
+
+* But this is very inefficient and performance would suffer the more the inbox grew
+
+* Regular gen_server callbacks support specifying an extra 'timeout' value on return, which gets fed directly to the receive/after clause deep inside the gen_server code
+```erlang
+% [...]
+loop(Parent, Name, State, Mod, Time, Debug) ->
+    Msg = receive
+	      Input ->
+		    Input
+	  after Time ->
+		  timeout
+	  end,
+% [...]
+```
+
+* Maybe we can use this to trigger our timers on idle periods
+* ...and busy waiting to cover more the active periods
+
+---
+## Example ##
+
+```erlang
+-module(simple_tick).
+-behaviour(ticked_gen_server).
+% [...]
+
+start_link() ->
+    ticked_gen_server:start_link(?MODULE, [], [{ticks, ["a simple tick"]}]).
+
+% [...]
+
+tick_duration("a simple tick", State) ->
+    % duration in milliseconds
+    {50, State}.
+
+% [...]
+
+handle_tick(TickId, TickGeneration, ActualTickDuration, State) ->
+    io:format("tick! ~p / ~p in ~pms", 
+              [TickId, TickGeneration, ActualTickDuration]),
+    %
+    % tick! "a simple tick" / 0 in 0ms
+    % tick! "a simple tick" / 1 in 50ms
+    % tick! "a simple tick" / 2 in 49ms
+    % tick! "a simple tick" / 3 in 50ms
+    %   ...
+    {noreply, State}.
+
+% [...]
+```
+---
+class: middle
+
+### Pros:
+* Ticks should be more precise - save for flooded inboxes
+* Tick duration can be dinamycally adjusted on overload
+* Ticking logic is abstracted away
+
+### Cons:
+* Slight execution overhead
+* Losing the ability of specifying timeouts on regular gen_server callbacks
+* Losing the ability of receiving messages made only of the atom 'timeout'
+
+### Unsolved problems:
+* Jitter introduced by events that take too much time to handle
+* Tick burst if the process execution is blocked for a while
+
+---
+class: middle, center
+
+# Thank you!
+
+* github.com/g-andrade/erlchronos
+
+![Default-aligned image](qr.jpg)
+
+    </textarea>
+    <script src="remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
