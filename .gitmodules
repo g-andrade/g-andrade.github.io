@@ -8,3 +8,6 @@
 [submodule "circles"]
 	path = circles
 	url = https://github.com/g-andrade/circles.git
+[submodule "shepard"]
+	path = shepard
+	url = https://github.com/g-andrade/shepard.git
