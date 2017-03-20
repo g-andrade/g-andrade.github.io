@@ -11,3 +11,6 @@
 [submodule "shepard"]
 	path = shepard
 	url = https://github.com/g-andrade/shepard.git
+[submodule "webgl-plot"]
+	path = webgl-plot
+	url = https://github.com/g-andrade/webgl-plot.git
