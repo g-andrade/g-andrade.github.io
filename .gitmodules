@@ -14,3 +14,6 @@
 [submodule "webgl-plot"]
 	path = webgl-plot
 	url = https://github.com/g-andrade/webgl-plot.git
+[submodule "kim-test"]
+	path = kim-test
+	url = https://github.com/g-andrade/kim.git
