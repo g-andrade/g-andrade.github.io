@@ -14,3 +14,6 @@
 [submodule "webgl-plot"]
 	path = webgl-plot
 	url = https://github.com/g-andrade/webgl-plot.git
+[submodule "curvature_blindness"]
+	path = curvature_blindness
+	url = https://github.com/g-andrade/curvature_blindness.git
