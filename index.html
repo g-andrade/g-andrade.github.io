@@ -39,7 +39,7 @@
 		width: 100%;
 		height: 100%;
 		z-index: -2;
-		opacity: 0.5; /* smudge glow reads better than the old static vortex; tune to taste */
+		opacity: 0.5; /* dimmed so the page text stays legible; tune to taste */
 		display: block;
 	}
 
@@ -192,8 +192,8 @@
 	<p class="foot">This profile is a work in progress.</p>
 </main>
 
-<!-- Touch/pointer "smudge" background — fragment source is fetched at runtime
-     from the .frag file so it stays the single source of truth.
+<!-- Animated background shader — fragment source is fetched at runtime from the
+     .frag file so it stays the single source of truth.
      NOTE: fetch() is blocked under file://; serve over HTTP for local testing
      (e.g. `python3 -m http.server`). -->
 <script id="vert" type="x-shader/x-vertex">
@@ -201,22 +201,6 @@ attribute vec2 position;
 void main() {
 	gl_Position = vec4(position, 0.0, 1.0);
 }
-</script>
-
-<!-- Blit: copy the smudge FBO straight to the screen. -->
-<script id="blit-vert" type="x-shader/x-vertex">
-attribute vec2 position;
-varying vec2 vUV;
-void main() {
-	vUV = position * 0.5 + 0.5;
-	gl_Position = vec4(position, 0.0, 1.0);
-}
-</script>
-<script id="blit-frag" type="x-shader/x-fragment">
-precision mediump float;
-uniform sampler2D tex;
-varying vec2 vUV;
-void main() { gl_FragColor = texture2D(tex, vUV); }
 </script>
 
 <script>
@@ -245,9 +229,8 @@ function init(fragSrc) {
 	var reduceMotion = window.matchMedia &&
 		window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-	// prefers-reduced-motion: skip the animated smudge entirely and let the
-	// static CSS gradient stand in. The smudge is a feedback animation, so
-	// there's no meaningful "one static frame" to show.
+	// prefers-reduced-motion: skip the animated shader entirely and let the
+	// static CSS gradient stand in.
 	if (reduceMotion) { fail(canvas); return; }
 
 	// --- compile + link ---------------------------------------------------
@@ -261,63 +244,35 @@ function init(fragSrc) {
 		}
 		return s;
 	}
-	function linkProg(vsSrc, fsSrc) {
-		var vs = compile(gl.VERTEX_SHADER, vsSrc);
-		var fs = compile(gl.FRAGMENT_SHADER, fsSrc);
-		if (!vs || !fs) return null;
-		var p = gl.createProgram();
-		gl.attachShader(p, vs);
-		gl.attachShader(p, fs);
-		gl.linkProgram(p);
-		if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
-			console.error(gl.getProgramInfoLog(p));
-			return null;
-		}
-		return p;
+
+	var vs = compile(gl.VERTEX_SHADER, document.getElementById("vert").textContent);
+	var fs = compile(gl.FRAGMENT_SHADER, fragSrc);
+	if (!vs || !fs) { fail(canvas, "shader compile failed"); return; }
+
+	var prog = gl.createProgram();
+	gl.attachShader(prog, vs);
+	gl.attachShader(prog, fs);
+	gl.linkProgram(prog);
+	if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+		console.error(gl.getProgramInfoLog(prog));
+		fail(canvas, "program link failed");
+		return;
 	}
+	gl.useProgram(prog);
 
-	var prog = linkProg(document.getElementById("vert").textContent, fragSrc);
-	var blit = linkProg(document.getElementById("blit-vert").textContent,
-	                    document.getElementById("blit-frag").textContent);
-	if (!prog || !blit) { fail(canvas, "shader compile/link failed"); return; }
-
-	// Full-screen triangle, shared by both passes.
+	// Full-screen triangle.
 	var buf = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, buf);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-	function bindQuad(p) {
-		var loc = gl.getAttribLocation(p, "position");
-		gl.enableVertexAttribArray(loc);
-		gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-	}
+	var loc = gl.getAttribLocation(prog, "position");
+	gl.enableVertexAttribArray(loc);
+	gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 
-	var uTime  = gl.getUniformLocation(prog, "time");
-	var uRes   = gl.getUniformLocation(prog, "resolution");
-	var uBack  = gl.getUniformLocation(prog, "backbuffer");
-	var uTouch = gl.getUniformLocation(prog, "touch");
-	var uPrev  = gl.getUniformLocation(prog, "touchPrev");
-	var uAct   = gl.getUniformLocation(prog, "touchActive");
-	var uTex   = gl.getUniformLocation(blit, "tex");
-
-	// --- ping-pong FBOs ---------------------------------------------------
-	// Two textures: read last frame's smudge from one, write this frame to the
-	// other, then swap. LINEAR sampling keeps the smear soft as it fades.
-	function makeFBO(w, h) {
-		var tex = gl.createTexture();
-		gl.bindTexture(gl.TEXTURE_2D, tex);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		var fbo = gl.createFramebuffer();
-		gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		return { tex: tex, fbo: fbo };
-	}
-	var fbos = null;   // [a, b]
-	var fboIdx = 0;
+	var uTime = gl.getUniformLocation(prog, "time");
+	var uRes  = gl.getUniformLocation(prog, "resolution");
+	// test.frag declares `mouse` (glslsandbox convention) but doesn't read it;
+	// pin it to centre so the background stays non-interactive. null loc = no-op.
+	gl.uniform2f(gl.getUniformLocation(prog, "mouse"), 0.5, 0.5);
 
 	// --- sizing -----------------------------------------------------------
 	// Cap DPR and render at 0.75 scale; CSS upscales. Cheaper and softer.
@@ -326,79 +281,19 @@ function init(fragSrc) {
 	function resize() {
 		var w = Math.max(1, Math.floor(canvas.clientWidth * DPR * SCALE));
 		var h = Math.max(1, Math.floor(canvas.clientHeight * DPR * SCALE));
-		if (canvas.width === w && canvas.height === h && fbos) return;
-		canvas.width = w;
-		canvas.height = h;
-		if (fbos) { // resizing throws away the in-progress smudge — acceptable
-			gl.deleteFramebuffer(fbos[0].fbo); gl.deleteTexture(fbos[0].tex);
-			gl.deleteFramebuffer(fbos[1].fbo); gl.deleteTexture(fbos[1].tex);
+		if (canvas.width !== w || canvas.height !== h) {
+			canvas.width = w;
+			canvas.height = h;
+			gl.viewport(0, 0, w, h);
 		}
-		fbos = [makeFBO(w, h), makeFBO(w, h)];
-		fboIdx = 0;
 	}
 	window.addEventListener("resize", resize);
-	resize();
 
-	// --- pointer / touch input -------------------------------------------
-	// JS only tracks the live pointer; the shader does the persistence. We
-	// listen on window (passive) so smudges appear even over the text, and so
-	// page scrolling/links keep working untouched. A still pointer stops
-	// depositing after HOLD_MS, which is what makes a lifted finger "let go".
-	var HOLD_MS = 120;
-	var touch = [0.5, 0.5];     // normalised, Y=0 at bottom (glslsandbox convention)
-	var touchPrev = [0.5, 0.5];
-	var lastInputMs = -1e9;
-	var freshContact = true;    // reset the swept segment on a new contact
-
-	function record(clientX, clientY) {
-		touch = [clientX / window.innerWidth, 1 - clientY / window.innerHeight];
-		lastInputMs = performance.now();
-	}
-	window.addEventListener("pointermove", function (e) {
-		record(e.clientX, e.clientY);
-	}, { passive: true });
-	window.addEventListener("pointerdown", function (e) {
-		freshContact = true;     // don't streak from wherever the pointer last was
-		record(e.clientX, e.clientY);
-	}, { passive: true });
-
-	// --- draw -------------------------------------------------------------
 	function draw(t) {
-		var now = performance.now();
-		var active = (now - lastInputMs) < HOLD_MS ? 1.0 : 0.0;
-		// On a fresh contact the segment is a point, not a streak from the old spot.
-		if (freshContact) { touchPrev = touch; freshContact = false; }
-
-		var cur  = fbos[fboIdx];
-		var prev = fbos[1 - fboIdx];
-
-		// Pass 1: smudge feedback → off-screen FBO, reading last frame's texture.
-		gl.bindFramebuffer(gl.FRAMEBUFFER, cur.fbo);
-		gl.viewport(0, 0, canvas.width, canvas.height);
-		gl.useProgram(prog);
-		bindQuad(prog);
+		resize();
 		gl.uniform1f(uTime, t);
 		gl.uniform2f(uRes, canvas.width, canvas.height);
-		gl.uniform2f(uTouch, touch[0], touch[1]);
-		gl.uniform2f(uPrev, touchPrev[0], touchPrev[1]);
-		gl.uniform1f(uAct, active);
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, prev.tex);
-		gl.uniform1i(uBack, 0);
 		gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-		// Pass 2: blit the smudge field to the screen.
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		gl.viewport(0, 0, canvas.width, canvas.height);
-		gl.useProgram(blit);
-		bindQuad(blit);
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, cur.tex);
-		gl.uniform1i(uTex, 0);
-		gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-		fboIdx = 1 - fboIdx;
-		touchPrev = touch; // this frame's pointer becomes next frame's segment start
 	}
 
 	// --- animation loop with continuous (non-jumping) time ----------------
@@ -414,7 +309,6 @@ function init(fragSrc) {
 		if (!lastMs) lastMs = ms;
 		elapsed += (ms - lastMs) / 1000;
 		lastMs = ms;
-		resize();
 		draw(elapsed);
 		raf = requestAnimationFrame(frame);
 	}
