@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guilherme Andrade</title>
+<style>
+	:root {
+		--ink: #e8e2e0;
+		--muted: #a89a96;
+		--bloodred: #8a0808;
+		--orange: #e38c2d;
+		--bg: #0a0807;
+	}
+
+	* { box-sizing: border-box; }
+
+	html, body {
+		margin: 0;
+		min-height: 100%;
+	}
+
+	body {
+		font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+		color: var(--ink);
+		/* Fallback layer: shown when WebGL is unavailable / context is lost,
+		   and visible *through* the canvas (opacity 0.5) when it is working.
+		   Tones sampled from the shader's bloodred palette so degrading is seamless. */
+		background:
+			radial-gradient(120% 90% at 50% 42%, rgba(138, 8, 8, 0.35), rgba(10, 8, 7, 0) 60%),
+			var(--bg);
+		background-attachment: fixed;
+	}
+
+	/* Animated shader, painted behind everything and dimmed. */
+	#bg {
+		position: fixed;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		z-index: -2;
+		opacity: 0.5; /* smudge glow reads better than the old static vortex; tune to taste */
+		display: block;
+	}
+
+	/* Vignette overlay — deepens edges and guarantees text contrast. */
+	#tint {
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
+		background: radial-gradient(120% 100% at 50% 40%, rgba(10, 8, 7, 0) 30%, rgba(10, 8, 7, 0.65) 100%);
+	}
+
+	main {
+		max-width: 760px;
+		margin: 0 auto;
+		padding: 14vh 24px 18vh;
+	}
+
+	h1 {
+		font-size: 2.4rem;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		margin: 0 0 0.2em;
+	}
+
+	.tagline {
+		color: var(--muted);
+		font-size: 1.05rem;
+		max-width: 56ch;
+	}
+
+	h2 {
+		font-size: 0.82rem;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		color: var(--orange);
+		margin: 3.2em 0 1em;
+	}
+
+	hr {
+		border: 0;
+		border-top: 1px solid rgba(232, 226, 224, 0.1);
+		margin: 2.6em 0;
+	}
+
+	a {
+		color: var(--ink);
+		text-decoration: none;
+		border-bottom: 1px solid rgba(227, 140, 45, 0.4);
+		transition: border-color 0.15s, color 0.15s;
+	}
+	a:hover { color: var(--orange); border-color: var(--orange); }
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.94rem;
+	}
+	td {
+		padding: 0.5em 0.6em 0.5em 0;
+		border-bottom: 1px solid rgba(232, 226, 224, 0.07);
+		vertical-align: top;
+	}
+	td:first-child { white-space: nowrap; font-weight: 500; }
+	td:last-child { text-align: right; color: var(--muted); white-space: nowrap; }
+	.desc { color: var(--muted); width: 100%; }
+
+	.pills a {
+		display: inline-block;
+		margin: 0 0.4em 0.5em 0;
+		padding: 0.15em 0.7em;
+		border: 1px solid rgba(232, 226, 224, 0.16);
+		border-radius: 999px;
+		font-size: 0.85rem;
+		color: var(--muted);
+	}
+	.pills a:hover { color: var(--orange); border-color: var(--orange); }
+
+	ul { padding-left: 1.2em; }
+	li { margin: 0.3em 0; }
+	code {
+		font-family: ui-monospace, "SF Mono", Menlo, monospace;
+		font-size: 0.88em;
+		color: var(--orange);
+	}
+	.dim { color: var(--muted); }
+	.foot { color: var(--muted); font-style: italic; font-size: 0.9rem; margin-top: 3.5em; }
+
+	@media (max-width: 540px) {
+		td:last-child { display: none; }
+		.desc { font-size: 0.88rem; }
+	}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div id="tint" aria-hidden="true"></div>
+
+<main>
+	<h1>Guilherme Andrade</h1>
+	<p class="tagline">
+		Software engineer based in Lisbon, specialising in Erlang and Elixir.
+		I've spent most of my career building distributed backend systems —
+		currently at <a href="https://dash.games">Dash Games</a>, previously a
+		decade at Miniclip, and briefly before that as a sysadmin at a university
+		computer lab.
+	</p>
+
+	<h2>Open source</h2>
+	<p class="dim">A selection of libraries I maintain, mostly for the BEAM ecosystem:</p>
+	<table>
+		<tr><td><a href="https://github.com/g-andrade/locus">locus</a></td><td class="desc">MMDB reader for Erlang/Elixir — IP geolocation and ASN lookup</td><td>★ 121</td></tr>
+		<tr><td><a href="https://github.com/sqids/sqids-elixir">sqids-elixir</a></td><td class="desc">Official Elixir port of Sqids — short unique IDs from numbers</td><td>★ 94</td></tr>
+		<tr><td><a href="https://github.com/g-andrade/aequitas">aequitas</a></td><td class="desc">Fairness regulator and rate limiter</td><td>★ 50</td></tr>
+		<tr><td><a href="https://github.com/g-andrade/backwater">backwater</a></td><td class="desc">Intercluster RPC for Erlang and Elixir</td><td>★ 48</td></tr>
+		<tr><td><a href="https://github.com/g-andrade/taskforce">taskforce</a></td><td class="desc">On-demand worker pools for parallelizable tasks</td><td>★ 43</td></tr>
+		<tr><td><a href="https://github.com/g-andrade/maestro">maestro</a></td><td class="desc">Pool of pools</td><td>★ 31</td></tr>
+		<tr><td><a href="https://github.com/g-andrade/deigma">deigma</a></td><td class="desc">Event sampler</td><td>★ 24</td></tr>
+		<tr><td><a href="https://github.com/g-andrade/tls_certificate_check">tls_certificate_check</a></td><td class="desc">CA store and partial chain handler for TLS</td><td>★ 23</td></tr>
+	</table>
+	<p><a href="https://github.com/g-andrade?tab=repositories">→ full list</a></p>
+
+	<h2>Upstream contributions</h2>
+	<p><strong><a href="https://github.com/erlang/otp">erlang/otp</a></strong></p>
+	<ul>
+		<li><code>ets:select_replace/2</code> — matchspec-based row replacement in ETS tables</li>
+		<li><code>math:fmod/2</code> — floating-point modulo BIF</li>
+		<li><code>enif_hash</code> — hashing arbitrary terms from NIF code</li>
+		<li>Cryptographically strong random number generation via <code>rand</code> plugin</li>
+		<li><code>zlib</code> inflation dictionary extraction</li>
+		<li>Various fixes and documentation improvements</li>
+	</ul>
+	<p class="dim">Erlang/Elixir ecosystem</p>
+	<p class="pills">
+		<a href="https://github.com/erlang/rebar3">rebar3</a>
+		<a href="https://github.com/erlef/rebar3_hex">rebar3_hex</a>
+		<a href="https://github.com/AdRoll/rebar3_hank">rebar3_hank</a>
+		<a href="https://github.com/elixir-lang/ex_doc">ex_doc</a>
+		<a href="https://github.com/akash-akya/exile">exile</a>
+		<a href="https://github.com/benoitc/hackney">hackney</a>
+		<a href="https://github.com/certifi/erlang-certifi">certifi</a>
+		<a href="https://github.com/search?q=author%3Ag-andrade+is%3Apr+is%3Amerged&type=pullrequests">others</a>
+	</p>
+
+	<h2>Technologies</h2>
+	<p><strong>Languages</strong> <span class="dim">— Erlang, Elixir, SQL; some C, C++, JavaScript, Python, Rust over the years</span></p>
+	<p><strong>Runtime / frameworks</strong> <span class="dim">— OTP, Cowboy, Phoenix (LiveView), Ecto, Protocol Buffers</span></p>
+	<p><strong>Infrastructure</strong> <span class="dim">— GCP (Cloud Run, Cloud SQL, GCS, Secret Manager, IAP, Workload Identity), Terraform, Docker, OpenTelemetry, GitHub Actions</span></p>
+
+	<p class="foot">This profile is a work in progress.</p>
+</main>
+
+<!-- Touch/pointer "smudge" background — fragment source is fetched at runtime
+     from the .frag file so it stays the single source of truth.
+     NOTE: fetch() is blocked under file://; serve over HTTP for local testing
+     (e.g. `python3 -m http.server`). -->
+<script id="vert" type="x-shader/x-vertex">
+attribute vec2 position;
+void main() {
+	gl_Position = vec4(position, 0.0, 1.0);
+}
+</script>
+
+<!-- Blit: copy the smudge FBO straight to the screen. -->
+<script id="blit-vert" type="x-shader/x-vertex">
+attribute vec2 position;
+varying vec2 vUV;
+void main() {
+	vUV = position * 0.5 + 0.5;
+	gl_Position = vec4(position, 0.0, 1.0);
+}
+</script>
+<script id="blit-frag" type="x-shader/x-fragment">
+precision mediump float;
+uniform sampler2D tex;
+varying vec2 vUV;
+void main() { gl_FragColor = texture2D(tex, vUV); }
+</script>
+
+<script>
+// Path to the shader source — encodeURI keeps this robust if the name gains spaces.
+var FRAG_URL = encodeURI("test.frag");
+
+function fail(canvas, msg) {
+	// Hide the canvas → the CSS gradient fallback shows through.
+	if (msg) console.warn("[background] " + msg + " — using CSS fallback.");
+	canvas.style.display = "none";
+}
+
+function init(fragSrc) {
+	"use strict";
+
+	var canvas = document.getElementById("bg");
+	var gl = null;
+	try {
+		var opts = { antialias: false, alpha: false, depth: false, powerPreference: "low-power" };
+		gl = canvas.getContext("webgl", opts) || canvas.getContext("experimental-webgl", opts);
+	} catch (e) { gl = null; }
+
+	// No WebGL → leave the CSS gradient fallback in place and bail.
+	if (!gl) { fail(canvas, "WebGL unavailable"); return; }
+
+	var reduceMotion = window.matchMedia &&
+		window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+	// prefers-reduced-motion: skip the animated smudge entirely and let the
+	// static CSS gradient stand in. The smudge is a feedback animation, so
+	// there's no meaningful "one static frame" to show.
+	if (reduceMotion) { fail(canvas); return; }
+
+	// --- compile + link ---------------------------------------------------
+	function compile(type, src) {
+		var s = gl.createShader(type);
+		gl.shaderSource(s, src);
+		gl.compileShader(s);
+		if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+			console.error(gl.getShaderInfoLog(s));
+			return null;
+		}
+		return s;
+	}
+	function linkProg(vsSrc, fsSrc) {
+		var vs = compile(gl.VERTEX_SHADER, vsSrc);
+		var fs = compile(gl.FRAGMENT_SHADER, fsSrc);
+		if (!vs || !fs) return null;
+		var p = gl.createProgram();
+		gl.attachShader(p, vs);
+		gl.attachShader(p, fs);
+		gl.linkProgram(p);
+		if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+			console.error(gl.getProgramInfoLog(p));
+			return null;
+		}
+		return p;
+	}
+
+	var prog = linkProg(document.getElementById("vert").textContent, fragSrc);
+	var blit = linkProg(document.getElementById("blit-vert").textContent,
+	                    document.getElementById("blit-frag").textContent);
+	if (!prog || !blit) { fail(canvas, "shader compile/link failed"); return; }
+
+	// Full-screen triangle, shared by both passes.
+	var buf = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+	function bindQuad(p) {
+		var loc = gl.getAttribLocation(p, "position");
+		gl.enableVertexAttribArray(loc);
+		gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+	}
+
+	var uTime  = gl.getUniformLocation(prog, "time");
+	var uRes   = gl.getUniformLocation(prog, "resolution");
+	var uBack  = gl.getUniformLocation(prog, "backbuffer");
+	var uTouch = gl.getUniformLocation(prog, "touch");
+	var uPrev  = gl.getUniformLocation(prog, "touchPrev");
+	var uAct   = gl.getUniformLocation(prog, "touchActive");
+	var uTex   = gl.getUniformLocation(blit, "tex");
+
+	// --- ping-pong FBOs ---------------------------------------------------
+	// Two textures: read last frame's smudge from one, write this frame to the
+	// other, then swap. LINEAR sampling keeps the smear soft as it fades.
+	function makeFBO(w, h) {
+		var tex = gl.createTexture();
+		gl.bindTexture(gl.TEXTURE_2D, tex);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		var fbo = gl.createFramebuffer();
+		gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		return { tex: tex, fbo: fbo };
+	}
+	var fbos = null;   // [a, b]
+	var fboIdx = 0;
+
+	// --- sizing -----------------------------------------------------------
+	// Cap DPR and render at 0.75 scale; CSS upscales. Cheaper and softer.
+	var DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+	var SCALE = 0.75;
+	function resize() {
+		var w = Math.max(1, Math.floor(canvas.clientWidth * DPR * SCALE));
+		var h = Math.max(1, Math.floor(canvas.clientHeight * DPR * SCALE));
+		if (canvas.width === w && canvas.height === h && fbos) return;
+		canvas.width = w;
+		canvas.height = h;
+		if (fbos) { // resizing throws away the in-progress smudge — acceptable
+			gl.deleteFramebuffer(fbos[0].fbo); gl.deleteTexture(fbos[0].tex);
+			gl.deleteFramebuffer(fbos[1].fbo); gl.deleteTexture(fbos[1].tex);
+		}
+		fbos = [makeFBO(w, h), makeFBO(w, h)];
+		fboIdx = 0;
+	}
+	window.addEventListener("resize", resize);
+	resize();
+
+	// --- pointer / touch input -------------------------------------------
+	// JS only tracks the live pointer; the shader does the persistence. We
+	// listen on window (passive) so smudges appear even over the text, and so
+	// page scrolling/links keep working untouched. A still pointer stops
+	// depositing after HOLD_MS, which is what makes a lifted finger "let go".
+	var HOLD_MS = 120;
+	var touch = [0.5, 0.5];     // normalised, Y=0 at bottom (glslsandbox convention)
+	var touchPrev = [0.5, 0.5];
+	var lastInputMs = -1e9;
+	var freshContact = true;    // reset the swept segment on a new contact
+
+	function record(clientX, clientY) {
+		touch = [clientX / window.innerWidth, 1 - clientY / window.innerHeight];
+		lastInputMs = performance.now();
+	}
+	window.addEventListener("pointermove", function (e) {
+		record(e.clientX, e.clientY);
+	}, { passive: true });
+	window.addEventListener("pointerdown", function (e) {
+		freshContact = true;     // don't streak from wherever the pointer last was
+		record(e.clientX, e.clientY);
+	}, { passive: true });
+
+	// --- draw -------------------------------------------------------------
+	function draw(t) {
+		var now = performance.now();
+		var active = (now - lastInputMs) < HOLD_MS ? 1.0 : 0.0;
+		// On a fresh contact the segment is a point, not a streak from the old spot.
+		if (freshContact) { touchPrev = touch; freshContact = false; }
+
+		var cur  = fbos[fboIdx];
+		var prev = fbos[1 - fboIdx];
+
+		// Pass 1: smudge feedback → off-screen FBO, reading last frame's texture.
+		gl.bindFramebuffer(gl.FRAMEBUFFER, cur.fbo);
+		gl.viewport(0, 0, canvas.width, canvas.height);
+		gl.useProgram(prog);
+		bindQuad(prog);
+		gl.uniform1f(uTime, t);
+		gl.uniform2f(uRes, canvas.width, canvas.height);
+		gl.uniform2f(uTouch, touch[0], touch[1]);
+		gl.uniform2f(uPrev, touchPrev[0], touchPrev[1]);
+		gl.uniform1f(uAct, active);
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, prev.tex);
+		gl.uniform1i(uBack, 0);
+		gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+		// Pass 2: blit the smudge field to the screen.
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		gl.viewport(0, 0, canvas.width, canvas.height);
+		gl.useProgram(blit);
+		bindQuad(blit);
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, cur.tex);
+		gl.uniform1i(uTex, 0);
+		gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+		fboIdx = 1 - fboIdx;
+		touchPrev = touch; // this frame's pointer becomes next frame's segment start
+	}
+
+	// --- animation loop with continuous (non-jumping) time ----------------
+	var elapsed = 0;      // accumulated shader seconds
+	var lastMs = 0;       // last rAF timestamp consumed
+	var raf = 0;
+	var visible = true;   // IntersectionObserver
+	var tabActive = !document.hidden;
+
+	function running() { return visible && tabActive; }
+
+	function frame(ms) {
+		if (!lastMs) lastMs = ms;
+		elapsed += (ms - lastMs) / 1000;
+		lastMs = ms;
+		resize();
+		draw(elapsed);
+		raf = requestAnimationFrame(frame);
+	}
+
+	function start() {
+		if (raf || !running()) return;
+		lastMs = 0; // avoid a time jump after a pause
+		raf = requestAnimationFrame(frame);
+	}
+	function stop() {
+		if (raf) { cancelAnimationFrame(raf); raf = 0; }
+	}
+
+	document.addEventListener("visibilitychange", function () {
+		tabActive = !document.hidden;
+		if (running()) start(); else stop();
+	});
+
+	if ("IntersectionObserver" in window) {
+		new IntersectionObserver(function (entries) {
+			visible = entries[0].isIntersecting;
+			if (running()) start(); else stop();
+		}).observe(canvas);
+	}
+
+	// Context loss → fall back to the CSS gradient.
+	canvas.addEventListener("webglcontextlost", function (e) {
+		e.preventDefault();
+		stop();
+		fail(canvas, "WebGL context lost");
+	});
+
+	start();
+}
+
+// Fetch the shader source, then start. Any failure (including file://, where
+// fetch is blocked) degrades to the CSS gradient fallback.
+fetch(FRAG_URL)
+	.then(function (r) {
+		if (!r.ok) throw new Error("HTTP " + r.status);
+		return r.text();
+	})
+	.then(init)
+	.catch(function (e) {
+		fail(document.getElementById("bg"),
+			"could not load shader (" + e.message + ")");
+	});
+</script>
+</body>
+</html>
