@@ -145,11 +145,34 @@
 	<h1>Guilherme Andrade</h1>
 	<p class="tagline">
 		Software engineer based in Lisbon, specialising in Erlang and Elixir.
-		I've spent most of my career building distributed backend systems —
-		currently at <a href="https://dashgames.co">Dash Games</a>, previously a
-		decade at Miniclip, and briefly before that as a sysadmin at a university
-		computer lab.
+		I've spent over a decade building distributed backend systems —
+		most recently at Dash Games, before that a decade at Miniclip, and
+		earlier as a sysadmin at RNL, Técnico Lisboa.
 	</p>
+
+	<h2>Experience</h2>
+	<p><strong>Dash Games</strong> <span class="dim">— Backend Engineer (contract) · 2023–2026</span></p>
+	<p class="dim">Sole engineer behind the studio's game backend — from the real-time game server and player systems to the full GCP infrastructure (Cloud Run, Cloud SQL, Terraform, IaC and CI/CD). End-to-end ownership across architecture, implementation, deployment and operations.</p>
+
+	<p><strong>Miniclip</strong> <span class="dim">— Senior Software Developer · 2013–2023</span></p>
+	<p class="dim">A decade building, deploying and operating the server-side systems behind some of Miniclip's biggest titles:</p>
+	<table>
+		<tr><td>8 Ball Pool</td><td class="desc">mobile</td><td>2013–2016</td></tr>
+		<tr><td>Agar.io</td><td class="desc">web + mobile</td><td>2016–2018</td></tr>
+		<tr><td>Soccer Stars</td><td class="desc"></td><td>2022</td></tr>
+		<tr><td>Mini Pets, Dino Pets</td><td class="desc"></td><td>2013–2014</td></tr>
+	</table>
+	<p class="dim">…among others — designing them, shipping them, and keeping them running in production.</p>
+	<p class="dim">The work spanned the full stack of a real-time game backend:</p>
+	<ul>
+		<li><strong>High-concurrency load management</strong> — worker pools, rate limiting and fair resource allocation under massive, spiky traffic</li>
+		<li><strong>Real-time networking</strong> — bandwidth-efficient serialization and compression for live multiplayer</li>
+		<li><strong>Spatial &amp; timing systems</strong> — proximity, matchmaking and precise game-loop scheduling</li>
+		<li><strong>Runtime-level performance</strong> — native code (NIFs) where the BEAM needed a push, plus fixes contributed back upstream into Erlang/OTP itself</li>
+	</ul>
+
+	<p><strong>RNL — Técnico Lisboa</strong> <span class="dim">· Systems Administrator · 2010–2012</span></p>
+	<p class="dim">Maintained computing and network infrastructure for the university's student-run IT group.</p>
 
 	<h2>Open source</h2>
 	<p class="dim">A selection of libraries I maintain, mostly for the BEAM ecosystem:</p>
@@ -212,8 +235,6 @@
 		<a href="https://www.linkedin.com/in/guilhermemandrade/">LinkedIn</a>
 		<a href="https://github.com/g-andrade">GitHub</a>
 	</p>
-
-	<p class="foot">This profile is a work in progress.</p>
 </main>
 
 <!-- Animated background shader — fragment source is fetched at runtime from the
