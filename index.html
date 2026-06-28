@@ -128,6 +128,13 @@
 		color: var(--orange);
 	}
 	.dim { color: var(--muted); }
+	.role {
+		font-size: 1.12rem;
+		font-weight: 600;
+		color: var(--ink);
+		margin: 2em 0 0.3em;
+	}
+	.role .dim { font-weight: 400; }
 	.foot { color: var(--muted); font-style: italic; font-size: 0.9rem; margin-top: 3.5em; }
 
 	@media (max-width: 540px) {
@@ -151,10 +158,10 @@
 	</p>
 
 	<h2>Experience</h2>
-	<p><strong>Dash Games</strong> <span class="dim">— Backend Engineer (contract) · 2023–2026</span></p>
+	<p class="role">Dash Games <span class="dim">— Backend Engineer (contract) · 2023–2026</span></p>
 	<p class="dim">Sole engineer behind the studio's game backend — from the real-time game server and player systems to the full GCP infrastructure (Cloud Run, Cloud SQL, Terraform, IaC and CI/CD). End-to-end ownership across architecture, implementation, deployment and operations.</p>
 
-	<p><strong>Miniclip</strong> <span class="dim">— Senior Software Developer · 2013–2023</span></p>
+	<p class="role">Miniclip <span class="dim">— Senior Software Developer · 2013–2023</span></p>
 	<p class="dim">A decade building, deploying and operating the server-side systems behind some of Miniclip's biggest titles:</p>
 	<table>
 		<tr><td>8 Ball Pool</td><td class="desc">mobile</td><td>2013–2016</td></tr>
@@ -171,7 +178,7 @@
 		<li><strong>Runtime-level performance</strong> — native code (NIFs) where the BEAM needed a push, plus fixes contributed back upstream into Erlang/OTP itself</li>
 	</ul>
 
-	<p><strong>RNL — Técnico Lisboa</strong> <span class="dim">· Systems Administrator · 2010–2012</span></p>
+	<p class="role">RNL — Técnico Lisboa <span class="dim">· Systems Administrator · 2010–2012</span></p>
 	<p class="dim">Maintained computing and network infrastructure for the university's student-run IT group.</p>
 
 	<h2>Open source</h2>
