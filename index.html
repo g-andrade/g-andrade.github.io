@@ -106,6 +106,8 @@
 	td:first-child { white-space: nowrap; font-weight: 500; }
 	td:last-child { text-align: right; color: var(--muted); white-space: nowrap; }
 	.desc { color: var(--muted); width: 100%; }
+	/* links table: name + description only, no right-aligned/hidden last column */
+	.links td:last-child { text-align: left; white-space: normal; }
 
 	.pills a {
 		display: inline-block;
@@ -130,6 +132,7 @@
 
 	@media (max-width: 540px) {
 		td:last-child { display: none; }
+		.links td:last-child { display: table-cell; }
 		.desc { font-size: 0.88rem; }
 	}
 </style>
@@ -183,6 +186,21 @@
 		<a href="https://github.com/certifi/erlang-certifi">certifi</a>
 		<a href="https://github.com/search?q=author%3Ag-andrade+is%3Apr+is%3Amerged&type=pullrequests">others</a>
 	</p>
+
+	<h2>Experiments</h2>
+	<p class="dim">Small interactive toys — audio illusions, optics, generative graphics:</p>
+	<table class="links">
+		<tr><td><a href="shepard/">Shepard tone</a></td><td class="desc">The auditory illusion of a pitch that seems to climb forever</td></tr>
+		<tr><td><a href="moog/">Moog</a></td><td class="desc">A little Moog-style audio synth toy</td></tr>
+		<tr><td><a href="curvature_blindness/">Curvature blindness</a></td><td class="desc">The curvature-blindness optical illusion, rendered live</td></tr>
+		<tr><td><a href="circles/">Circles</a></td><td class="desc">Generative canvas animation with live controls</td></tr>
+		<tr><td><a href="teardrop/">Teardrop</a></td><td class="desc">Generative canvas animation that responds to mouse movement</td></tr>
+		<tr><td><a href="coalescence/">Coalescence</a></td><td class="desc">Audio-reactive canvas visualisation</td></tr>
+		<tr><td><a href="webgl-plot/">WebGL plotter</a></td><td class="desc">Plots mathematical formulas in WebGL</td></tr>
+	</table>
+
+	<h2>Talks</h2>
+	<p><a href="talks/erlchronos_euc2016/">erlchronos</a> <span class="dim">— a gen_server wrapper with ticks (Erlang User Conference 2016)</span></p>
 
 	<h2>Technologies</h2>
 	<p><strong>Languages</strong> <span class="dim">— Erlang, Elixir, SQL; some C, C++, JavaScript, Python, Rust over the years</span></p>
